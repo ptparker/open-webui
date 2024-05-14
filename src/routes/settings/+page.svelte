@@ -1,3 +1,12 @@
+<script context="module">
+  // This script runs before the component is created and can include preloading logic
+  export async function load({ params, fetch }) {
+    // You can perform any preloading operations here if necessary
+    // For now, we'll just return an empty object
+    return {};
+  }
+</script>
+
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 
