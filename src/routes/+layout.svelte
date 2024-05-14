@@ -1,11 +1,11 @@
 <script>
 	import { onMount, tick, setContext } from 'svelte';
 	import { config, user, theme, WEBUI_NAME } from '$lib/stores';
-	import { goto } from '$app/navigation';
+	// import { goto } from '$app/navigation';
 	import { Toaster, toast } from 'svelte-sonner';
 
 	import { getBackendConfig } from '$lib/apis';
-	import { getSessionUser } from '$lib/apis/auths';
+	// import { getSessionUser } from '$lib/apis/auths';
 
 	import '../tailwind.css';
 	import '../app.css';
@@ -37,28 +37,29 @@
 			console.log(backendConfig);
 
 			if ($config) {
-				if (localStorage.token) {
-					// Get Session User Info
-					const sessionUser = await getSessionUser(localStorage.token).catch((error) => {
-						toast.error(error);
-						return null;
-					});
+				// Temporarily bypassing the authentication check for debugging purposes
+				// if (localStorage.token) {
+				// 	// Get Session User Info
+				// 	const sessionUser = await getSessionUser(localStorage.token).catch((error) => {
+				// 		toast.error(error);
+				// 		return null;
+				// 	});
 
-					if (sessionUser) {
-						// Save Session User to Store
-						await user.set(sessionUser);
-					} else {
-						// Redirect Invalid Session User to /auth Page
-						localStorage.removeItem('token');
-						await goto('/auth');
-					}
-				} else {
-					await goto('/auth');
-				}
+				// 	if (sessionUser) {
+				// 		// Save Session User to Store
+				// 		await user.set(sessionUser);
+				// 	} else {
+				// 		// Redirect Invalid Session User to /auth Page
+				// 		localStorage.removeItem('token');
+				// 		await goto('/auth');
+				// 	}
+				// } else {
+				// 	await goto('/auth');
+				// }
 			}
 		} else {
 			// Redirect to /error when Backend Not Detected
-			await goto(`/error`);
+			// await goto(`/error`);
 		}
 
 		await tick();

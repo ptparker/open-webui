@@ -492,6 +492,28 @@
 		models.set(await getModels());
 	};
 
+	async function editYAMLHandler() {
+	    try {
+	        const response = await fetch('/config', {
+	            method: 'GET',
+	            headers: {
+	                'Content-Type': 'application/json',
+	                'Authorization': `Bearer ${localStorage.token}`
+	            }
+	        });
+	        if (!response.ok) {
+	            throw new Error('Failed to fetch YAML configuration');
+	        }
+	        const yamlContent = await response.json();
+	        // TODO: Implement logic to display Monaco Editor with the YAML content
+	        // TODO: Implement logic to save changes back to the server
+	        console.log('YAML configuration fetched successfully:', yamlContent);
+	    } catch (error) {
+	        console.error('Error fetching YAML configuration:', error);
+	        toast.error('Error fetching YAML configuration');
+	    }
+	}
+
 	onMount(async () => {
 		OLLAMA_URLS = await getOllamaUrls(localStorage.token).catch((error) => {
 			toast.error(error);
@@ -551,6 +573,12 @@
 										</svg>
 									</button>
 								</Tooltip>
+								<button
+									class="mt-4 px-2.5 bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700 rounded-lg transition"
+									on:click={editYAMLHandler}
+								>
+									Directly Edit YAML
+								</button>
 							</div>
 						</div>
 					</div>

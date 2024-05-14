@@ -193,6 +193,25 @@ async def get_config(user=Depends(get_admin_user)):
     return app.state.CONFIG
 
 
+class BackupConfigForm(BaseModel):
+    yaml_content: str
+    backup_filename: str
+
+@app.post("/config/backup")
+async def backup_config(form_data: BackupConfigForm, user=Depends(get_admin_user)):
+    try:
+        backup_path = os.path.join(DATA_DIR, 'litellm', 'backups', form_data.backup_filename)
+        with open(backup_path, 'w') as backup_file:
+            backup_file.write(form_data.yaml_content)
+        return {"message": "Backup created successfully."}
+    except Exception as e:
+        log.error(f"Failed to create backup: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create backup."
+        )
+
+
 class LiteLLMConfigForm(BaseModel):
     general_settings: Optional[dict] = None
     litellm_settings: Optional[dict] = None
