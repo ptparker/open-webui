@@ -17,7 +17,7 @@
 	import Suggestions from './MessageInput/Suggestions.svelte';
 	import AddFilesPlaceholder from '../AddFilesPlaceholder.svelte';
 	import Documents from './MessageInput/Documents.svelte';
-	import Models from './MessageInput/Models.svelte';
+	import Models from '../../../routes/settings/Models.svelte';
 	import Tooltip from '../common/Tooltip.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
 

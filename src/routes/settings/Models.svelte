@@ -1,3 +1,7 @@
+<script context="module">
+  // This script runs before the component is created and can include preloading logic
+</script>
+
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 
