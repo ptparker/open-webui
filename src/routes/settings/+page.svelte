@@ -8,6 +8,7 @@
 </script>
 
 <script lang="ts">
+	import MonacoEditor from 'svelte-monaco';
 	import { createEventDispatcher } from 'svelte';
 
 	import { generatePrompt } from '$lib/apis/ollama';
@@ -140,9 +141,60 @@
 	};
 </script>
 
+<script>
+  import MonacoEditor from 'svelte-monaco';
+  import { writable } from 'svelte/store';
+
+  // Reactive variable to hold the YAML content
+  let yamlContent = writable(`# YAML content goes here`);
+
+  // Function to save changes to the YAML content
+  async function saveChanges() {
+    try {
+      const response = await fetch('/config/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ yaml_content: $yamlContent }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to save changes');
+      }
+      alert('Changes saved successfully');
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    }
+  }
+
+  // Function to create a backup of the YAML content
+  async function createBackup() {
+    const backupFilename = `backup-${new Date().toISOString()}.yaml`;
+    try {
+      const response = await fetch('/config/backup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ yaml_content: $yamlContent, backup_filename: backupFilename }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create backup');
+      }
+      alert('Backup created successfully');
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    }
+  }
+</script>
+
 <div class="settings-content">
   <h1>Settings</h1>
-  <p>This is the settings page. More content will be added here.</p>
+  <!-- Monaco Editor for YAML content -->
+  <MonacoEditor bind:value={$yamlContent} language="yaml" theme="vs-dark" />
+  <!-- Buttons for saving changes and creating backups -->
+  <button on:click={saveChanges}>Save Changes</button>
+  <button on:click={createBackup}>Create Backup</button>
 </div>
 
 <div class="md:px-2 mb-3 text-left w-full absolute bottom-0 left-0 right-0">
