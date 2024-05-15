@@ -140,6 +140,11 @@
 	};
 </script>
 
+<div class="settings-content">
+  <h1>Settings</h1>
+  <p>This is the settings page. More content will be added here.</p>
+</div>
+
 {#if prompt.charAt(0) === '@'}
 	{#if filteredModels.length > 0}
 		<div class="md:px-2 mb-3 text-left w-full absolute bottom-0 left-0 right-0">
