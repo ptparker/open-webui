@@ -9,7 +9,7 @@
 
 <script lang="ts">
 	import MonacoEditor from 'svelte-monaco';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, writable } from 'svelte';
 
 	import { generatePrompt } from '$lib/apis/ollama';
 	import { models } from '$lib/stores';
@@ -139,11 +139,6 @@
 
 		console.log(user);
 	};
-</script>
-
-<script>
-  import MonacoEditor from 'svelte-monaco';
-  import { writable } from 'svelte/store';
 
   // Reactive variable to hold the YAML content
   let yamlContent = writable(`# YAML content goes here`);
