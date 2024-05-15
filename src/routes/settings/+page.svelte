@@ -9,7 +9,8 @@
 
 <script lang="ts">
 	import MonacoEditor from 'svelte-monaco';
-	import { createEventDispatcher, writable } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
+	import { writable } from 'svelte/store';
 
 	import { generatePrompt } from '$lib/apis/ollama';
 	import { models } from '$lib/stores';
