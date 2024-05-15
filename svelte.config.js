@@ -14,11 +14,13 @@ const config = {
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
-			fallback: 'index.html'
-		})
+			fallback: 'index.html',
+			precompress: false
+		}),
+		// Removed the prerender.default option as it was causing an error during build
 	},
 	onwarn: (warning, handler) => {
-		const { code, _ } = warning;
+		const { code } = warning;
 		if (code === 'css-unused-selector') return;
 
 		handler(warning);
