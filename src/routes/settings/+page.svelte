@@ -199,7 +199,7 @@
 <div class="settings-content">
   <h1>Settings</h1>
   <!-- Monaco Editor for YAML content -->
-  <MonacoEditor bind:value={$yamlContent} language="yaml" theme="vs-dark" class="yaml-editor" />
+  <MonacoEditor bind:value={$yamlContent} options={{ language: 'yaml', theme: 'vs-dark' }} class="yaml-editor" />
   <!-- Buttons for saving changes and creating backups -->
   <button on:click={saveChanges}>Save Changes</button>
   <button on:click={createBackup}>Create Backup</button>
