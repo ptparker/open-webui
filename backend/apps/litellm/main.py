@@ -406,3 +406,10 @@ async def get_config_yaml(user=Depends(get_admin_user)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to read config.yaml."
         )
+
+@app.get("/debug/env")
+async def debug_env():
+    return {
+        "DATA_DIR": DATA_DIR,
+        "LITELLM_CONFIG_DIR": LITELLM_CONFIG_DIR
+    }
