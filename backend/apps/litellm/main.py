@@ -40,7 +40,7 @@ import warnings
 
 warnings.simplefilter("ignore")
 
-from litellm.utils import get_llm_provider
+from utils.utils import get_llm_provider
 
 import asyncio
 import subprocess
@@ -392,4 +392,17 @@ async def proxy(path: str, request: Request, user=Depends(get_verified_user)):
 
         raise HTTPException(
             status_code=r.status_code if r else 500, detail=error_detail
+        )
+
+@app.get("/api/config/yaml")
+async def get_config_yaml(user=Depends(get_admin_user)):
+    try:
+        with open(LITELLM_CONFIG_DIR, "r") as file:
+            yaml_content = file.read()
+        return Response(content=yaml_content, media_type="application/x-yaml")
+    except IOError as e:
+        log.error(f"Failed to read config.yaml: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to read config.yaml."
         )

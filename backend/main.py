@@ -67,27 +67,35 @@ log.setLevel(SRC_LOG_LEVELS["MAIN"])
 
 
 class SPAStaticFiles(StaticFiles):
-    async def get_response(self, path: str, scope):
-        try:
-            return await super().get_response(path, scope)
-        except (HTTPException, StarletteHTTPException) as ex:
-            if ex.status_code == 404:
-                return await super().get_response("index.html", scope)
-            else:
-                raise ex
+    class SPAStaticFiles(StaticFiles):
+        async def get_response(self, path: str, scope):
+            # Exclude API routes from being served the index.html file
+            if path.startswith("/api/"):
+                response = await super().get_response(path, scope)
+                if response.status_code != 404:
+                    return response
+                else:
+                    raise HTTPException(status_code=404, detail="Not Found")
+            try:
+                return await super().get_response(path, scope)
+            except (HTTPException, StarletteHTTPException) as ex:
+                if ex.status_code == 404:
+                    return await super().get_response("index.html", scope)
+                else:
+                    raise ex
 
 
 print(
     rf"""
-  ___                    __        __   _     _   _ ___ 
+  ___                    __        __   _     _   _ ___
  / _ \ _ __   ___ _ __   \ \      / /__| |__ | | | |_ _|
-| | | | '_ \ / _ \ '_ \   \ \ /\ / / _ \ '_ \| | | || | 
-| |_| | |_) |  __/ | | |   \ V  V /  __/ |_) | |_| || | 
+| | | | '_ \ / _ \ '_ \   \ \ /\ / / _ \ '_ \| | | || |
+| |_| | |_) |  __/ | | |   \ V  V /  __/ |_) | |_| || |
  \___/| .__/ \___|_| |_|    \_/\_/ \___|_.__/ \___/|___|
-      |_|                                               
+      |_|
 
-      
-v{VERSION} - building the best open-source AI user interface.      
+
+v{VERSION} - building the best open-source AI user interface.
 https://github.com/open-webui/open-webui
 """
 )
@@ -250,6 +258,18 @@ async def get_app_config():
         "admin_export_enabled": ENABLE_ADMIN_EXPORT,
     }
 
+@app.get("/api/config/yaml")
+async def get_config_yaml():
+    try:
+        with open("/app/backend/data/litellm/config.yaml", "r") as file:
+            yaml_content = file.read()
+        return Response(content=yaml_content, media_type="application/x-yaml")
+    except IOError as e:
+        log.error(f"Failed to read config.yaml: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to read config.yaml."
+        )
 
 @app.get("/api/config/model/filter")
 async def get_model_filter_config(user=Depends(get_admin_user)):

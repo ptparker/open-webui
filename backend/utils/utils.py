@@ -129,3 +129,8 @@ def get_admin_user(user=Depends(get_current_user)):
             detail=ERROR_MESSAGES.ACCESS_PROHIBITED,
         )
     return user
+
+# Placeholder function for 'get_llm_provider'
+def get_llm_provider():
+    # TODO: Implement the actual logic for 'get_llm_provider'
+    pass

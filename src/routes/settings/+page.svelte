@@ -1,8 +1,15 @@
 <script context="module">
   // This script runs before the component is created and can include preloading logic
   export async function load({ params, fetch }) {
-    // You can perform any preloading operations here if necessary
-    // For now, we'll just return an empty object
+    // Fetch the current YAML content from the backend
+    const response = await fetch('/api/config/yaml');
+    if (response.ok) {
+      const data = await response.json();
+      // Set the fetched content to the yamlContent store
+      yamlContent.set(data.yaml_content);
+    } else {
+      throw new Error('Failed to load YAML content');
+    }
     return {};
   }
 </script>
