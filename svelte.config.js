@@ -29,9 +29,9 @@ const config = {
     vite: {
         server: {
             proxy: {
-                // Explicitly define the API route for the YAML content
-                '/api/config/yaml': {
-                    target: 'http://localhost:5000', // Updated the target port to 5000 to match the backend server
+                // Proxy all API requests to the backend server
+                '/api': {
+                    target: 'http://localhost:5000', // Backend server
                     changeOrigin: true,
                     secure: false,
                     ws: true
