@@ -4,9 +4,9 @@
     // Fetch the current YAML content from the backend
     const response = await fetch('/api/config/yaml');
     if (response.ok) {
-      const yamlContent = await response.text();
+      const yamlText = await response.text();
       // Set the fetched content to the yamlContent store
-      yamlContent.set(yamlContent);
+      yamlContent.set(yamlText);
     } else {
       throw new Error('Failed to load YAML content');
     }
