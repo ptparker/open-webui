@@ -2,12 +2,15 @@
   // This script runs before the component is created and can include preloading logic
   export async function load({ params, fetch }) {
     // Fetch the current YAML content from the backend
+    console.log('Fetching YAML content from the backend...');
     const response = await fetch('/api/config/yaml');
     if (response.ok) {
       const yamlText = await response.text();
+      console.log('YAML content fetched:', yamlText);
       // Set the fetched content to the yamlContent store
       yamlContent.set(yamlText);
     } else {
+      console.error('Failed to load YAML content', response);
       throw new Error('Failed to load YAML content');
     }
     return {};
@@ -153,6 +156,7 @@
 
   // Function to save changes to the YAML content
   async function saveChanges() {
+    console.log('Attempting to save changes...');
     try {
       const response = await fetch('/config/update', {
         method: 'POST',
@@ -164,14 +168,17 @@
       if (!response.ok) {
         throw new Error('Failed to save changes');
       }
+      console.log('Changes saved successfully');
       alert('Changes saved successfully');
     } catch (error) {
+      console.error(`Error saving changes: ${error.message}`);
       alert(`Error: ${error.message}`);
     }
   }
 
   // Function to create a backup of the YAML content
   async function createBackup() {
+    console.log('Attempting to create a backup...');
     const backupFilename = `backup-${new Date().toISOString()}.yaml`;
     try {
       const response = await fetch('/config/backup', {
@@ -184,8 +191,10 @@
       if (!response.ok) {
         throw new Error('Failed to create backup');
       }
+      console.log('Backup created successfully');
       alert('Backup created successfully');
     } catch (error) {
+      console.error(`Error creating backup: ${error.message}`);
       alert(`Error: ${error.message}`);
     }
   }

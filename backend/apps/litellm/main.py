@@ -59,7 +59,7 @@ app.add_middleware(
 )
 
 
-LITELLM_CONFIG_DIR = f"{DATA_DIR}/litellm/config.yaml"
+LITELLM_CONFIG_DIR = "/home/ubuntu/open-webui/backend/data/litellm/config.yaml"
 
 with open(LITELLM_CONFIG_DIR, "r") as file:
     litellm_config = yaml.safe_load(file)
@@ -395,7 +395,7 @@ async def proxy(path: str, request: Request, user=Depends(get_verified_user)):
         )
 
 @app.get("/api/config/yaml")
-async def get_config_yaml(user=Depends(get_admin_user)):
+async def get_config_yaml():
     try:
         with open(LITELLM_CONFIG_DIR, "r") as file:
             yaml_content = file.read()
