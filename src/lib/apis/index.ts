@@ -3,7 +3,7 @@ import { WEBUI_BASE_URL } from '$lib/constants';
 export const getBackendConfig = async () => {
 	let error = null;
 
-	const res = await fetch(`${WEBUI_BASE_URL}/api/config`, {
+	const res = await fetch(`http://localhost:5002/api/config`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json'
@@ -29,7 +29,7 @@ export const getBackendConfig = async () => {
 export const getChangelog = async () => {
 	let error = null;
 
-	const res = await fetch(`${WEBUI_BASE_URL}/api/changelog`, {
+	const res = await fetch(`http://localhost:5002/api/changelog`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json'
@@ -55,7 +55,7 @@ export const getChangelog = async () => {
 export const getVersionUpdates = async () => {
 	let error = null;
 
-	const res = await fetch(`${WEBUI_BASE_URL}/api/version/updates`, {
+	const res = await fetch(`http://localhost:5002/api/version/updates`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json'
@@ -81,7 +81,7 @@ export const getVersionUpdates = async () => {
 export const getModelFilterConfig = async (token: string) => {
 	let error = null;
 
-	const res = await fetch(`${WEBUI_BASE_URL}/api/config/model/filter`, {
+	const res = await fetch(`http://localhost:5002/api/config/model/filter`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ export const updateModelFilterConfig = async (
 ) => {
 	let error = null;
 
-	const res = await fetch(`${WEBUI_BASE_URL}/api/config/model/filter`, {
+	const res = await fetch(`http://localhost:5002/api/config/model/filter`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ export const updateModelFilterConfig = async (
 export const getWebhookUrl = async (token: string) => {
 	let error = null;
 
-	const res = await fetch(`${WEBUI_BASE_URL}/api/webhook`, {
+	const res = await fetch(`http://localhost:5002/api/webhook`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ export const getWebhookUrl = async (token: string) => {
 export const updateWebhookUrl = async (token: string, url: string) => {
 	let error = null;
 
-	const res = await fetch(`${WEBUI_BASE_URL}/api/webhook`, {
+	const res = await fetch(`http://localhost:5002/api/webhook`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',

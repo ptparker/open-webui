@@ -3,7 +3,7 @@
   export async function load({ params, fetch }) {
     // Fetch the current YAML content from the backend
     console.log('Fetching YAML content from the backend...');
-    const response = await fetch('/api/config/yaml');
+    const response = await fetch('/config/yaml');
     if (response.ok) {
       const yamlText = await response.text();
       console.log('YAML content fetched:', yamlText);
@@ -152,7 +152,7 @@
 	};
 
   // Reactive variable to hold the YAML content
-  let yamlContent = writable(`# YAML content goes here`);
+  let yamlContent = writable('');
 
   // Function to save changes to the YAML content
   async function saveChanges() {
@@ -208,7 +208,7 @@
 <div class="settings-content">
   <h1>Settings</h1>
   <!-- Monaco Editor for YAML content -->
-  <MonacoEditor bind:value={$yamlContent} options={{ language: 'yaml', theme: 'vs-dark' }} />
+  <MonacoEditor bind:value={$yamlContent} class="yaml-editor" options={{ language: 'yaml', theme: 'vs-dark' }} />
   <!-- Buttons for saving changes and creating backups -->
   <button on:click={saveChanges}>Save Changes</button>
   <button on:click={createBackup}>Create Backup</button>

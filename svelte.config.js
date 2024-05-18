@@ -31,9 +31,9 @@ const config = {
             proxy: {
                 // Proxy all API requests to the backend server
                 '/api': {
-                    target: 'http://localhost:5001', // Backend server running on port 5001
+                    target: 'http://localhost:5002', // Backend server running on port 5002
                     changeOrigin: true,
-                    secure: false, // Set to false since we are using HTTP for local development
+                    secure: false, // Set to false since we are not using HTTPS for local development
                     ws: true
                 }
             }

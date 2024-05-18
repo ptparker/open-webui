@@ -26,7 +26,6 @@ from apps.litellm.main import (
     shutdown_litellm_background,
 )
 
-
 from apps.audio.main import app as audio_app
 from apps.images.main import app as images_app
 from apps.rag.main import app as rag_app
@@ -35,7 +34,6 @@ from apps.web.main import app as webui_app
 import asyncio
 from pydantic import BaseModel
 from typing import List
-
 
 from utils.utils import get_admin_user
 from apps.rag.utils import rag_messages
@@ -67,22 +65,21 @@ log.setLevel(SRC_LOG_LEVELS["MAIN"])
 
 
 class SPAStaticFiles(StaticFiles):
-    class SPAStaticFiles(StaticFiles):
-        async def get_response(self, path: str, scope):
-            # Exclude API routes from being served the index.html file
-            if path.startswith("/api/"):
-                response = await super().get_response(path, scope)
-                if response.status_code != 404:
-                    return response
-                else:
-                    raise HTTPException(status_code=404, detail="Not Found")
-            try:
-                return await super().get_response(path, scope)
-            except (HTTPException, StarletteHTTPException) as ex:
-                if ex.status_code == 404:
-                    return await super().get_response("index.html", scope)
-                else:
-                    raise ex
+    async def get_response(self, path: str, scope):
+        # Exclude API routes from being served the index.html file
+        if path.startswith("/api/"):
+            response = await super().get_response(path, scope)
+            if response.status_code != 404:
+                return response
+            else:
+                raise HTTPException(status_code=404, detail="Not Found")
+        try:
+            return await super().get_response(path, scope)
+        except (HTTPException, StarletteHTTPException) as ex:
+            if ex.status_code == 404:
+                return await super().get_response("index.html", scope)
+            else:
+                raise ex
 
 
 print(
@@ -261,7 +258,7 @@ async def get_app_config():
 @app.get("/api/config/yaml")
 async def get_config_yaml():
     try:
-        with open("/app/backend/data/litellm/config.yaml", "r") as file:
+        with open("./data/litellm/config.yaml", "r") as file:
             yaml_content = file.read()
         return Response(content=yaml_content, media_type="application/x-yaml")
     except IOError as e:
@@ -391,6 +388,7 @@ async def get_opensearch_xml():
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.mount("/cache", StaticFiles(directory=CACHE_DIR), name="cache")
 
+# Mount the SPA static files after all API routes have been defined to ensure API requests are not served static files
 if os.path.exists(FRONTEND_BUILD_DIR):
     app.mount(
         "/",
