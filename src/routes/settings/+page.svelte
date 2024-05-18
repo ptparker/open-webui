@@ -3,7 +3,7 @@
   export async function load({ params, fetch }) {
     // Fetch the current YAML content from the backend
     console.log('Fetching YAML content from the backend...');
-    const response = await fetch('/config/yaml');
+    const response = await fetch('/api/config/yaml');
     if (response.ok) {
       const yamlText = await response.text();
       console.log('YAML content fetched:', yamlText);
@@ -18,147 +18,55 @@
 </script>
 
 <script lang="ts">
-	import MonacoEditor from 'svelte-monaco';
-	import { createEventDispatcher } from 'svelte';
-	import { writable } from 'svelte/store';
+  import { onMount, onDestroy } from 'svelte';
+  import * as monaco from 'monaco-editor';
+  import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+  import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+  import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+  import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+  import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+  import { writable } from 'svelte/store';
 
-	import { generatePrompt } from '$lib/apis/ollama';
-	import { models } from '$lib/stores';
-	import { splitStream } from '$lib/utils';
-	import { tick, getContext } from 'svelte';
-	import { toast } from 'svelte-sonner';
-
-	const i18n = getContext('i18n');
-
-	const dispatch = createEventDispatcher();
-
-	export let prompt = '';
-	export let user = null;
-
-	export let chatInputPlaceholder = '';
-	export let messages = [];
-
-	let selectedIdx = 0;
-	let filteredModels = [];
-
-	$: filteredModels = $models
-		.filter((p) => p.name.includes(prompt.split(' ')?.at(0)?.substring(1) ?? ''))
-		.sort((a, b) => a.name.localeCompare(b.name));
-
-	$: if (prompt) {
-		selectedIdx = 0;
-	}
-
-	export const selectUp = () => {
-		selectedIdx = Math.max(0, selectedIdx - 1);
-	};
-
-	export const selectDown = () => {
-		selectedIdx = Math.min(selectedIdx + 1, filteredModels.length - 1);
-	};
-
-	const confirmSelect = async (model) => {
-		prompt = '';
-		dispatch('select', model);
-	};
-
-	const confirmSelectCollaborativeChat = async (model) => {
-		// dispatch('select', model);
-		prompt = '';
-		user = JSON.parse(JSON.stringify(model.name));
-		await tick();
-
-		chatInputPlaceholder = $i18n.t('{{modelName}} is thinking...', { modelName: model.name });
-
-		const chatInputElement = document.getElementById('chat-textarea');
-
-		await tick();
-		chatInputElement?.focus();
-		await tick();
-
-		const convoText = messages.reduce((a, message, i, arr) => {
-			return `${a}### ${message.role.toUpperCase()}\n${message.content}\n\n`;
-		}, '');
-
-		const res = await generatePrompt(localStorage.token, model.name, convoText);
-
-		if (res && res.ok) {
-			const reader = res.body
-				.pipeThrough(new TextDecoderStream())
-				.pipeThrough(splitStream('\n'))
-				.getReader();
-
-			while (true) {
-				const { value, done } = await reader.read();
-				if (done) {
-					break;
-				}
-
-				try {
-					let lines = value.split('\n');
-
-					for (const line of lines) {
-						if (line !== '') {
-							console.log(line);
-							let data = JSON.parse(line);
-
-							if ('detail' in data) {
-								throw data;
-							}
-
-							if ('id' in data) {
-								console.log(data);
-							} else {
-								if (data.done == false) {
-									if (prompt == '' && data.response == '\n') {
-										continue;
-									} else {
-										prompt += data.response;
-										console.log(data.response);
-										chatInputElement.scrollTop = chatInputElement.scrollHeight;
-										await tick();
-									}
-								}
-							}
-						}
-					}
-				} catch (error) {
-					console.log(error);
-					if ('detail' in error) {
-						toast.error(error.detail);
-					}
-					break;
-				}
-			}
-		} else {
-			if (res !== null) {
-				const error = await res.json();
-				console.log(error);
-				if ('detail' in error) {
-					toast.error(error.detail);
-				} else {
-					toast.error(error.error);
-				}
-			} else {
-				toast.error(
-					$i18n.t('Uh-oh! There was an issue connecting to {{provider}}.', { provider: 'llama' })
-				);
-			}
-		}
-
-		chatInputPlaceholder = '';
-
-		console.log(user);
-	};
-
-  // Reactive variable to hold the YAML content
+  let editorContainer: HTMLElement;
+  let editor: monaco.editor.IStandaloneCodeEditor;
   let yamlContent = writable('');
+
+  self.MonacoEnvironment = {
+    getWorker: function (_: string, label: string) {
+      switch (label) {
+        case 'css': return new cssWorker();
+        case 'html': return new htmlWorker();
+        case 'json': return new jsonWorker();
+        case 'typescript':
+        case 'javascript': return new tsWorker();
+        default: return new editorWorker();
+      }
+    }
+  };
+
+  onMount(() => {
+    editor = monaco.editor.create(editorContainer, {
+      value: $yamlContent,
+      language: 'yaml',
+      theme: 'vs-dark'
+    });
+
+    return () => {
+      editor.dispose();
+    };
+  });
+
+  onDestroy(() => {
+    if (editor) {
+      editor.dispose();
+    }
+  });
 
   // Function to save changes to the YAML content
   async function saveChanges() {
     console.log('Attempting to save changes...');
     try {
-      const response = await fetch('/config/update', {
+      const response = await fetch('/api/config/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -181,7 +89,7 @@
     console.log('Attempting to create a backup...');
     const backupFilename = `backup-${new Date().toISOString()}.yaml`;
     try {
-      const response = await fetch('/config/backup', {
+      const response = await fetch('/api/config/backup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -201,14 +109,15 @@
 </script>
 
 <style>
-  .yaml-editor {
-    min-height: 500px; /* Set a minimum height for the YAML editor */
+  .editor-container {
+    width: 100%;
+    height: 600px;
   }
 </style>
+
 <div class="settings-content">
   <h1>Settings</h1>
-  <!-- Monaco Editor for YAML content -->
-  <MonacoEditor bind:value={$yamlContent} class="yaml-editor" options={{ language: 'yaml', theme: 'vs-dark' }} />
+  <div class="editor-container" bind:this={editorContainer}></div>
   <!-- Buttons for saving changes and creating backups -->
   <button on:click={saveChanges}>Save Changes</button>
   <button on:click={createBackup}>Create Backup</button>
